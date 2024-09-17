@@ -230,7 +230,7 @@ def find_best_matching_images(user_images_urls, image_url_list, similarity_thres
         kk=0
         jj=0
         for exhibition_filename, exhibition_img in exhibition_images:
-            similarity = align_images_orb2(user_img, exhibition_img)
+            similarity = align_images_akaze(user_img, exhibition_img)
             if similarity >= best_similarity:
                 best_similarity = similarity
                 best_match_url = exhibition_filename
@@ -250,6 +250,43 @@ def crop_center(img, cropx, cropy):
     startx = x // 2 - (cropx // 2)
     starty = y // 2 - (cropy // 2)
     return img[starty:starty + cropy, startx:startx + cropx]
+
+
+def align_images_akaze(img1, img2, max_features=1000):
+    
+    # Convert images to grayscale
+    img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # Initialize AKAZE detector
+    akaze = cv2.AKAZE_create()
+    keypoints1, descriptors1 = akaze.detectAndCompute(img1_gray, None)
+    keypoints2, descriptors2 = akaze.detectAndCompute(img2_gray, None)
+
+    # Use Brute-Force Matcher with NORM_HAMMING
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+    matches = bf.knnMatch(descriptors1, descriptors2, k=2)
+
+    # Apply ratio test to keep good matches
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append(m)
+
+    MIN_MATCH_COUNT = 10
+    if len(good_matches) > MIN_MATCH_COUNT:
+        src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+
+        # Find homography
+        M, mask = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 5.0)
+        if M is not None:
+            
+            return len(good_matches)
+        else:
+            return -1
+    else:
+        return -2
 
 
 def align_images_orb2(img1, img2, max_features=1000,crop_ratio=0.6):
