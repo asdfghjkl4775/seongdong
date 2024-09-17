@@ -230,7 +230,7 @@ def find_best_matching_images(user_images_urls, image_url_list, similarity_thres
         kk=0
         jj=0
         for exhibition_filename, exhibition_img in exhibition_images:
-            similarity = align_images_akaze(user_img, exhibition_img)
+            similarity = align_images_orb2(user_img, exhibition_img)
             if similarity >= best_similarity:
                 best_similarity = similarity
                 best_match_url = exhibition_filename
