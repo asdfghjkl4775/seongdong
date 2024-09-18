@@ -209,28 +209,45 @@ def colormatching(randomrgb):
                 closest_color_rgb = color_set
     return closest_color_name, closest_color_rgb
 
-def find_best_matching_images(user_images_urls, image_url_list, similarity_threshold=30):
+def find_best_matching_images(user_images_urls, image_url_list, similarity_threshold=15):
     exhibition_images = []
     for url in image_url_list['url']:
         img = load_image_from_url_with_requests(url)
         if img is not None:
             exhibition_images.append((url, img))
+
     user_images = []
     for url in user_images_urls:
         img = load_image_from_url_with_requests(url)
         if img is not None:
             user_images.append((url, img))
+
     valid_urls2 = {
         'url': [],
         'color_cluster_ratio': []
     }
+    #sift = cv2.SIFT_create()
+    #akaze = cv2.AKAZE_create()
+    orb = cv2.ORB_create()
     for user_filename, user_img in user_images:
+        img1_gray = cv2.cvtColor(user_img, cv2.COLOR_BGR2GRAY)
+        # akaze + orb2
+        #keypoints1_akaze = akaze.detect(img1_gray, None)
+        #keypoints1, descriptors1 = orb.compute(img1_gray, keypoints1_akaze)
+
+        #keypoints1, descriptors1 = akaze.detectAndCompute(img1_gray, None)
+        #keypoints1_akaze, descriptors1_akaze = akaze.detectAndCompute(img1_gray, None)
+        keypoints1_orb, descriptors1_orb = orb.detectAndCompute(img1_gray, None)
+
+        #keypoints1, descriptors1 = sift.detectAndCompute(img1_gray, None)
+        
         best_match_url = None
         best_similarity = 0
         kk=0
         jj=0
         for exhibition_filename, exhibition_img in exhibition_images:
-            similarity = align_images_orb2(user_img, exhibition_img)
+            similarity = align_images_orb2(descriptors1_orb, exhibition_img)
+            print(user_filename,':', exhibition_filename, '=', similarity)
             if similarity >= best_similarity:
                 best_similarity = similarity
                 best_match_url = exhibition_filename
@@ -241,6 +258,8 @@ def find_best_matching_images(user_images_urls, image_url_list, similarity_thres
                 valid_urls2['url'].append(best_match_url)
                 valid_urls2['color_cluster_ratio'].append(image_url_list['color_cluster_ratio'][jj])
     return valid_urls2
+
+
     
 def gaussian_kernel(x, y, sigma=1.0):
     return np.exp(-np.linalg.norm(x - y) ** 2 / (2 * (sigma ** 2)))
@@ -289,17 +308,17 @@ def align_images_akaze(img1, img2, max_features=1000):
         return -2
 
 
-def align_images_orb2(img1, img2, max_features=1000,crop_ratio=0.6):
+def align_images_orb2(descriptors1, img2, x_crop_ratio=0.7, y_crop_ratio=0.6):
 
-    h, w, _ = img1.shape
-    cropx, cropy = int(w * crop_ratio), int(h * crop_ratio)
-    img1_cropped = crop_center(img1, cropx, cropy)
+    # h, w, _ = img1.shape
+    # cropx, cropy = int(w * x_crop_ratio), int(h * y_crop_ratio)
+    # img1_cropped = crop_center(img1, cropx, cropy)
 
-    img1_gray = cv2.cvtColor(img1_cropped, cv2.COLOR_BGR2GRAY)
+    #img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
-    orb = cv2.ORB_create(nfeatures=max_features)
-    keypoints1, descriptors1 = orb.detectAndCompute(img1_gray, None)
+    orb = cv2.ORB_create()
+    #keypoints1, descriptors1 = orb.detectAndCompute(img1_gray, None)
     keypoints2, descriptors2 = orb.detectAndCompute(img2_gray, None)
 
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
@@ -310,27 +329,32 @@ def align_images_orb2(img1, img2, max_features=1000,crop_ratio=0.6):
         if m.distance < 0.75 * n.distance:
             good_matches.append(m)
 
-    MIN_MATCH_COUNT = 100
+    MIN_MATCH_COUNT = 10
     if len(good_matches) > MIN_MATCH_COUNT:
-        src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-        dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        return len(good_matches)
+        # src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        # dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
-        M, mask = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 5.0)
-        if M is not None:
-            img2_aligned = cv2.warpPerspective(img2, M, (img1.shape[1], img1.shape[0]))
+        # M, mask = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 5.0)
+        # if M is not None:
+        #     img2_aligned = cv2.warpPerspective(img2, M, (img1.shape[1], img1.shape[0]))
 
-            img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-            img2_gray = cv2.cvtColor(img2_aligned, cv2.COLOR_BGR2GRAY)
+        #     img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+        #     img2_gray = cv2.cvtColor(img2_aligned, cv2.COLOR_BGR2GRAY)
 
-            hash1 = imagehash.phash(Image.fromarray(img1_gray))
-            hash2 = imagehash.phash(Image.fromarray(img2_gray))
+        #     #score, _ = ssim(img1_gray, img2_gray, full=True)
+            
+            
+        #     hash1 = imagehash.phash(Image.fromarray(img1_gray))
+        #     hash2 = imagehash.phash(Image.fromarray(img2_gray))
 
-            similarity = 100 - (hash1 - hash2) / len(hash1.hash) ** 2 * 100
-            return similarity
-        else:
-            return 0
+        # #     similarity = 100 - (hash1 - hash2) / len(hash1.hash) ** 2 * 100
+            
+        #     return len(good_matches)
+        # else:
+        #     return -1
     else:
-        return 0
+        return -2
 
 def analyze_images_and_cluster(user_images_urls, result, num_clusters_spectral: int = 4, sigma: float = 30):
     #matching_urls = user_images_urls
