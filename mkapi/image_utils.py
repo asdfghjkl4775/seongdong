@@ -226,31 +226,48 @@ def find_best_matching_images(user_images_urls, image_url_list, similarity_thres
         'url': [],
         'color_cluster_ratio': []
     }
-    #sift = cv2.SIFT_create()
-    #akaze = cv2.AKAZE_create()
-    orb = cv2.ORB_create()
+
+    akaze = cv2.AKAZE_create()
+    #orb = cv2.ORB_create()
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+    akaze_exhibition = {
+        'url': [],
+        'descriptors': []
+    }
+    for exhibition_url, exhibition_img in exhibition_images:
+        img2_gray = cv2.cvtColor(exhibition_img, cv2.COLOR_BGR2GRAY)
+        _, descriptors2_akaze = akaze.detectAndCompute(img2_gray, None)
+        #_, descriptors2_akaze = orb.detectAndCompute(img2_gray, None)
+        akaze_exhibition["url"].append(exhibition_url)
+        akaze_exhibition['descriptors'].append(descriptors2_akaze)
+    
     for user_filename, user_img in user_images:
+
         img1_gray = cv2.cvtColor(user_img, cv2.COLOR_BGR2GRAY)
-        # akaze + orb2
-        #keypoints1_akaze = akaze.detect(img1_gray, None)
-        #keypoints1, descriptors1 = orb.compute(img1_gray, keypoints1_akaze)
-
-        #keypoints1, descriptors1 = akaze.detectAndCompute(img1_gray, None)
-        #keypoints1_akaze, descriptors1_akaze = akaze.detectAndCompute(img1_gray, None)
-        keypoints1_orb, descriptors1_orb = orb.detectAndCompute(img1_gray, None)
-
-        #keypoints1, descriptors1 = sift.detectAndCompute(img1_gray, None)
-        
+        keypoints1_akaze, descriptors1_akaze = akaze.detectAndCompute(img1_gray, None)
+        #keypoints1_akaze, descriptors1_akaze = orb.detectAndCompute(img1_gray, None)
+       
         best_match_url = None
         best_similarity = 0
         kk=0
         jj=0
-        for exhibition_filename, exhibition_img in exhibition_images:
-            similarity = align_images_orb2(descriptors1_orb, exhibition_img)
-            print(user_filename,':', exhibition_filename, '=', similarity)
+        for des in akaze_exhibition['descriptors']:
+            matches = bf.knnMatch(descriptors1_akaze, des, k=2)
+            good_matches = []
+            for m, n in matches:
+                if m.distance < 0.75 * n.distance:
+                    good_matches.append(m)
+            
+            MIN_MATCH_COUNT = 40
+            if len(good_matches) > MIN_MATCH_COUNT:
+                similarity = len(good_matches)
+            else:
+                similarity = -2
+            
             if similarity >= best_similarity:
                 best_similarity = similarity
-                best_match_url = exhibition_filename
+                best_match_url = akaze_exhibition['url'][kk]
+                print(user_filename,':', akaze_exhibition['url'][kk], '=', best_similarity)
                 jj = kk
             kk += 1
         if best_similarity >= similarity_threshold:
