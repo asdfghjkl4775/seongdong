@@ -373,9 +373,11 @@ def align_images_orb2(descriptors1, img2, x_crop_ratio=0.7, y_crop_ratio=0.6):
     else:
         return -2
 
+
+
 def analyze_images_and_cluster(user_images_urls, result, num_clusters_spectral: int = 4, sigma: float = 30):
     #matching_urls = user_images_urls
-    print(user_images_urls['url'])
+    
     if len(user_images_urls['url'])>4:
         final_dict = {}
         kkk = 0
@@ -405,9 +407,22 @@ def analyze_images_and_cluster(user_images_urls, result, num_clusters_spectral: 
         target_keys = user_images_urls['url']
     elif user_images_urls['url'] == []:
         target_keys = random.choices(result['url'], k=4)
+    elif len(user_images_urls['url']) == 3:
+        target_keys = user_images_urls['url']
+        result2 = [url for url in result['url'] if url not in target_keys]
+        target_keys.append(random.choices(result2, k=1)[0])
+    elif len(user_images_urls['url']) == 2:
+        target_keys = user_images_urls['url']
+        result2 = [url for url in result['url'] if url not in target_keys]
+        for i in range(2):
+            target_keys.append(result2[i])
     else:
-        target_keys = random.choices(user_images_urls['url'], k=4)
+        target_keys = user_images_urls['url']
+        result2 = [url for url in result['url'] if url not in target_keys]
+        for i in range(3):
+            target_keys.append(result2[i])
     return target_keys
+
 
 
 def find_signiture_color(user_images_urls, num_clusters=10):
