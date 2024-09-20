@@ -402,6 +402,8 @@ async def leaflet_creating(image_data: ImageData):
                         max_color = color[2]
                         recommend_picture = key
 
+
+
         recommend_picture_list = []
         if recommend_picture:
             for i in range(len(new_color_dict)):
@@ -409,11 +411,13 @@ async def leaflet_creating(image_data: ImageData):
                     recommend_picture_list.append(rrow[i]['url'])
                     recommend_picture_list.append(rrow[i]['title'])
                     recommend_picture_list.append(rrow[i]['author'])
+                    recommend_picture_list.append(rrow[i]['description'])
         else:
             no_no = random.randint(1, len(rrow))
             recommend_picture_list.append(rrow[no_no]['url'])
             recommend_picture_list.append(rrow[no_no]['title'])
             recommend_picture_list.append(rrow[no_no]['author'])
+            recommend_picture_list.appedn(rrow[no_no]['description'])
             recommend_picture = rrow[no_no]['url']
 
         target_mood = mood_dict[recommend_picture]
@@ -447,6 +451,8 @@ async def leaflet_creating(image_data: ImageData):
                 recommend_picture_list2.append(rrow[i]['url'])
                 recommend_picture_list2.append(rrow[i]['title'])
                 recommend_picture_list2.append(rrow[i]['author'])
+                recommend_picture_list2.append(rrow[i]['description'])
+
 
         cursor.execute("SELECT * FROM exhibitions WHERE exhibition_id = %s OR exhibition_id = %s", (11, 12))
         exhibition = cursor.fetchall()
