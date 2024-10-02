@@ -353,6 +353,12 @@ async def leaflet_creating(image_data: ImageData):
         analysis_result = analyze_images_and_cluster(
             matching_urls,result
         )
+        
+        example = []
+        for url in analysis_result:
+            cursor.execute("SELECT description FROM images_exhibition_13 WHERE url = %s", (url,))
+            wow = cursor.fetchone()
+            example.append(wow['description'])
 
         # 3. 취향분석하기
         #max_color = 0
@@ -464,8 +470,9 @@ async def leaflet_creating(image_data: ImageData):
         text_user['user_rgb'] = user_rgb
         text_user['recom_picture1'] = recommend_picture_list
         text_user['recom_picture2'] = recommend_picture_list2
-        text_user['spectral_key'] = [analysis_result]
+        text_user['spectral_key'] = [[analysis_result],[example]]
         text_user['recom_exhibition'] = recom_exhibition
+        
         return text_user
     except HTTPException as e:
         raise e
