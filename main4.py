@@ -356,8 +356,10 @@ async def leaflet_creating(image_data: ImageData):
         
         example = []
         for url in analysis_result:
-            cursor.execute("SELECT description FROM images_exhibition_13 WHERE url = %s", (url,))
+            cursor.execute("SELECT author, title, description FROM images_exhibition_13 WHERE url = %s", (url,))
             wow = cursor.fetchone()
+            example.append(wow['author'])
+            example.append(wow['title'])
             example.append(wow['description'])
 
         # 3. 취향분석하기
