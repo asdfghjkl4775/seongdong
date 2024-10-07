@@ -461,7 +461,7 @@ async def leaflet_creating(image_data: ImageData):
                 recommend_picture_list2.append(rrow[i]['author'])
                 recommend_picture_list2.append(rrow[i]['description'])
 
-
+        #추천전시가 11,12가 뜸
         cursor.execute("SELECT * FROM exhibitions WHERE exhibition_id = %s OR exhibition_id = %s", (11, 12))
         exhibition = cursor.fetchall()
 

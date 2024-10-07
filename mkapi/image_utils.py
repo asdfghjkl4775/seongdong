@@ -376,14 +376,12 @@ def align_images_orb2(descriptors1, img2, x_crop_ratio=0.7, y_crop_ratio=0.6):
 
 
 def analyze_images_and_cluster(user_images_urls, result, num_clusters_spectral: int = 4, sigma: float = 30):
-    #matching_urls = user_images_urls
-    
-    if len(user_images_urls['url'])>4:
+    if len(user_images_urls['url']) > 4:
         final_dict = {}
         kkk = 0
         for image_url in user_images_urls['url']:
             final_dict[image_url] = tuple(json.loads(user_images_urls['color_cluster_ratio'][kkk])[0][1])
-            kkk +=1
+            kkk += 1
         rgb_colors = [value for value in final_dict.values()]
         rgb_colors_array = np.array(rgb_colors)
         n_samples = len(rgb_colors)
@@ -395,33 +393,41 @@ def analyze_images_and_cluster(user_images_urls, result, num_clusters_spectral: 
         labels = spectral.fit_predict(similarity_matrix)
         cluster_centers = np.array([rgb_colors_array[labels == i].mean(axis=0) for i in range(num_clusters_spectral)], dtype=int)
         target_keys = []
+        selected_keys = set()  # 중복 방지용 set 추가
         for center in cluster_centers:
             distances = cdist([center], rgb_colors_array, metric='euclidean')[0]
             closest_index = np.argmin(distances)
             closest_color = rgb_colors_array[closest_index]
             rgb_colors_array = np.delete(rgb_colors_array, closest_index, axis=0)
             possible_keys = [key for key, value in final_dict.items() if np.array_equal(value, closest_color)]
-            selected_key = np.random.choice(possible_keys)
-            target_keys.append(selected_key)
+            possible_keys = [key for key in possible_keys if key not in selected_keys]  # 중복 방지
+            if possible_keys:
+                selected_key = np.random.choice(possible_keys)
+                selected_keys.add(selected_key)  # 선택된 키 추가
+                target_keys.append(selected_key)
+                
     elif len(user_images_urls['url']) == 4:
-        target_keys = user_images_urls['url']
+        target_keys = list(set(user_images_urls['url']))  # 중복 방지
     elif user_images_urls['url'] == []:
-        target_keys = random.choices(result['url'], k=4)
+        target_keys = list(set(random.sample(result['url'], k=4)))  # 중복 방지
     elif len(user_images_urls['url']) == 3:
-        target_keys = user_images_urls['url']
+        target_keys = list(set(user_images_urls['url']))
         result2 = [url for url in result['url'] if url not in target_keys]
-        target_keys.append(random.choices(result2, k=1)[0])
+        target_keys.append(random.sample(result2, k=1)[0])
     elif len(user_images_urls['url']) == 2:
-        target_keys = user_images_urls['url']
+        target_keys = list(set(user_images_urls['url']))
         result2 = [url for url in result['url'] if url not in target_keys]
+        result3 = random.sample(result2, k=2)
         for i in range(2):
-            target_keys.append(result2[i])
+            target_keys.append(result3[i])
     else:
-        target_keys = user_images_urls['url']
+        target_keys = list(set(user_images_urls['url']))
         result2 = [url for url in result['url'] if url not in target_keys]
+        result3 = random.sample(result2, k=3)
         for i in range(3):
-            target_keys.append(result2[i])
-    return target_keys
+            target_keys.append(result3[i])
+
+    return list(set(target_keys))
 
 
 
