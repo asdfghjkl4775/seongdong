@@ -531,9 +531,9 @@ def find_nearby_exhibitions(current_location, exhibitions, radius):
 
 
 List1 = ["Cinnabar", "Brandy Rose", "Granite Green", "Cioccolato", "Deep Bronze", "Metallic Copper", "Tamarillo", "Apple Blossom", "Feldspar", "Vesuvius", "Tonys Pink", "Lemon Ginger", "Guardsman Red", "Mandy", "Costa Del Sol"]
-List2 = ["Black", "Matterhorn", "Nobel", "Very Light Grey", "White Smoke", "Wistful", "Tiber", "Wafer", "Pale Rose", "Oyster Pink", "Opal", "London Hue", "Aqua Squeeze", "Oxley"]
+List2 = ["Black", "Matterhorn", "Nobel", "Very Light Grey", "White Smoke", "Wistful", "Tiber", "Wafer", "Pale Rose", "Oyster Pink", "Opal", "Aqua Squeeze", "Oxley"]
 List3 = ["Paris Daisy", "Corn Field", "Kournikova", "Tangerine Yellow", "Persian Indigo", "Cobalt", "Manz", "Cerulean", "Vida Loca", "Granny Smith", "Wheat", "Chetwode Blue", "Siam", "Seagull", "Gulf Stream", "Heather", "Hawkes Blue"]
-List4 = ["Bahia", "Gossip", "Pumpkin", "Harvest Gold", "Dark Pastel Green", "Shamrock Green", "Salem", "Eastern Blue", "Wild Willow", "Chelsea Cucumber", "Fun Green", "Deep Teal", "Timber Green", "Palm Green", "Surfie Green", "Blue Lagoon", "Camarone", "Green House", "Sprout"]
+List4 = ["Bahia", "Gossip", "Pumpkin", "Harvest Gold", "Dark Pastel Green", "Shamrock Green", "Salem", "Eastern Blue", "Wild Willow", "Chelsea Cucumber", "Fun Green", "Deep Teal", "Timber Green", "Palm Green", "Surfie Green", "Blue Lagoon", "Camarone", "Green House", "Sprout", "London Hue"]
 
 
 
