@@ -459,7 +459,7 @@ def find_signiture_color(user_images_urls, num_clusters=10):
 
     return final_signiture_color[0][0]
 
-def find_nearby_exhibitions(current_location, exhibitions, radius):
+def find1_nearby_exhibitions(current_location, exhibitions, radius):
     def haversine(coord1, coord2):
         R = 6371  # 지구의 반지름 (단위: km)
 
@@ -497,10 +497,46 @@ def find_nearby_exhibitions(current_location, exhibitions, radius):
     return info
 
 
-List1 = ["Cinnabar", "Paris Daisy", "Corn Field", "Kournikova", "Tangerine Yellow", "Pumpkin", "Harvest Gold", "Brandy Rose", "Granite Green", "Manz", "Cioccolato", "Deep Bronze", "Metallic Copper", "Feldspar", "Vesuvius", "Lemon Ginger", "Costa Del Sol"]
-List2 = ["White Smoke", "Wistful", "Tonys Pink", "Wafer", "Granny Smith", "Wheat", "Pale Rose", "Oyster Pink", "Opal", "London Hue", "Mandy", "Chetwode Blue", "Aqua Squeeze", "Sprout", "Oxley", "Seagull", "Gulf Stream", "Heather", "Hawkes Blue"]
-List3 = ["Black", "Persian Indigo", "Cobalt", "Wild Willow", "Cerulean", "Timber Green", "Palm Green", "Tiber", "Tamarillo", "Apple Blossom", "Surfie Green", "Blue Lagoon", "Guardsman Red"]
-List4 = ["Matterhorn", "Nobel", "Very Light Grey", "Bahia", "Gossip", "Dark Pastel Green", "Shamrock Green", "Salem", "Eastern Blue", "Chelsea Cucumber", "Fun Green", "Deep Teal", "Camarone", "Vida Loca", "Green House", "Siam"]
+import math
+
+def find_nearby_exhibitions(current_location, exhibitions, radius):
+    """
+    현재 위치에서 주어진 반경 내에 있는 전시회 중 가장 가까운 전시회를 찾습니다.
+    유클리드 거리 계산을 사용합니다.
+    
+    Parameters:
+    - current_location: (lat, lon) 형태의 튜플
+    - exhibitions: [["Exhibition1", [lat1, lon1]], ["Exhibition2", [lat2, lon2]], ...]
+    - radius: 반경 (단위: 동일한 위도/경도 단위, 예: 도)
+    
+    Returns:
+    - 가장 가까운 전시회의 이름
+    """
+    found_exhibitions = {}
+    for exhibit in exhibitions:
+        name, coords = exhibit
+        # 유클리드 거리 계산
+        distance = math.sqrt((current_location[0] - coords[0])**2 + (current_location[1] - coords[1])**2)
+        print(distance, name)
+        if distance <= radius:
+            found_exhibitions[name] = distance
+
+    # 가장 가까운 전시회 찾기
+    if found_exhibitions:
+        nearest_exhibition = min(found_exhibitions, key=found_exhibitions.get)
+        return nearest_exhibition
+    else:
+        return None
+
+
+
+List1 = ["Cinnabar", "Brandy Rose", "Granite Green", "Cioccolato", "Deep Bronze", "Metallic Copper", "Tamarillo", "Apple Blossom", "Feldspar", "Vesuvius", "Tonys Pink", "Lemon Ginger", "Guardsman Red", "Mandy", "Costa Del Sol"]
+List2 = ["Black", "Matterhorn", "Nobel", "Very Light Grey", "White Smoke", "Wistful", "Tiber", "Wafer", "Pale Rose", "Oyster Pink", "Opal", "London Hue", "Aqua Squeeze", "Oxley"]
+List3 = ["Paris Daisy", "Corn Field", "Kournikova", "Tangerine Yellow", "Persian Indigo", "Cobalt", "Manz", "Cerulean", "Vida Loca", "Granny Smith", "Wheat", "Chetwode Blue", "Siam", "Seagull", "Gulf Stream", "Heather", "Hawkes Blue"]
+List4 = ["Bahia", "Gossip", "Pumpkin", "Harvest Gold", "Dark Pastel Green", "Shamrock Green", "Salem", "Eastern Blue", "Wild Willow", "Chelsea Cucumber", "Fun Green", "Deep Teal", "Timber Green", "Palm Green", "Surfie Green", "Blue Lagoon", "Camarone", "Green House", "Sprout"]
+
+
+
 
 def leaflet_design(dominant_color):
     if dominant_color in List1:
