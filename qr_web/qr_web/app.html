@@ -494,6 +494,9 @@
         <p style="color: rgb(243, 13, 31); font-weight: bold;">해당 블록의 색상과 아래 이미지를 보고 최종장소를 추측하세요.</p>
         <img src="최종방탈출_퀴즈.png" alt="Block A Image" id="blockAImage" style="width: 100%; height: 400px;">
     </div>
+    <div id="blockCDescription" style="display: none;">
+      <img src="야외_퀴즈쇼.jpeg" alt="Block C Image" id="blockCImage" style="width: 100%; height: 400px;">
+    </div>
     <input type="text" id="answerInput" placeholder="Enter answer here">
     <button id="color_button" onclick="submitAnswer()">Submit</button>
     <button id="hint1" onclick="showHint(1)">Hint 1</button>
@@ -518,7 +521,7 @@
   </div>
 
   <script>
-      const correctPassword = "123456";
+    const correctPassword = "123456";
   
     function verifyPassword() {
       const passwordInput = document.getElementById("passwordInput").value;
@@ -537,8 +540,8 @@
     const questions = {
       A: { question: '최종 장소 퀴즈\n(힌트존재)', hint1: 'OOO OO길 OO',answer: '아차산 13길 31'},  
       B: { question: "성수역 내부에 수제화 전시회로 가서 18세기 유럽 여성들 사이에서 유행한 슬리퍼 형태의 구두를 찾으세요.\n(힌트존재)",hint1:'문제에 정답이?', answer: "슬리퍼", correct_hint:'열정(passion)' },
-      C: { question: "해당 블록의 소 공원으로 이동하세요.", answer: "손오공", correct_hint: '재료' },
-      D: { question: "해당 블록에서 가장 핫 한 카페 근처 전봇대에 QR코드를 찾으세요", answer: "묵찌빠",correct_hint:'기쁨', hint1:'양파' },
+      C: { question: "해당 블록의 소 공원으로 이동하세요. \n 아래 포스터와 유사한 포스터를 찾고 틀린 그림을 찾으세요", answer: "발바닥", correct_hint: '재료',hint1:'OOO', hint2:'OOㄷ' },
+      D: { question: "해당 블록에서 가장 핫 한 카페 근처 전봇대에 QR코드를 찾으세요", answer: "화가",correct_hint:'기쁨', hint1:'양파' },
       E: { question: "무진장 신발 사진이 많은 곳을 찾아가세요. 해당 건물은 몇 층일까요? (숫자만 입력)\n(정답을 제출하고 HINT를 누르면 UP, DOWN으로 힌트 제공)", answer: "10", hint1: "", hint2: "",correct_hint:'파킨슨증후군' },
       F: { question: "해당 블록에서 2개의 허브를 담고 있는 건물의 이름은?(띄어쓰기X, 힌트O)", answer: "아크밸리지식산업센터",correct_hint:'노력',hint1:'아크OOOOOOOO', hint2:'10글자' },
       G: { question: "해당 블록에서 아이 벽화를 찾고 아이가 착용하고 있는 신발의 브랜드를 맞춰보세요.(한국말로 입력)", answer: "아디다스",correct_hint:'외계인', hint1:''},
@@ -578,6 +581,11 @@
             document.getElementById("blockADescription").style.display = "block";
         } else {
             document.getElementById("blockADescription").style.display = "none";
+        }
+        if (block === 'C') {
+            document.getElementById("blockCDescription").style.display = "block";
+        } else {
+            document.getElementById("blockCDescription").style.display = "none";
         }
     }
   
