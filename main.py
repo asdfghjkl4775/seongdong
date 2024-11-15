@@ -14,3 +14,8 @@ async def read_root(request: Request):
     with open(os.path.join(BASE_DIR, "app.html"), "r", encoding="utf-8") as f:
         html_content = f.read()
     return HTMLResponse(content=html_content)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
